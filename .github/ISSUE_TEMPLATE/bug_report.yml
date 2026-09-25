@@ -1,0 +1,138 @@
+name: "AI-Ready Bug Report"
+description: "Report a bug with enough context for AI-assisted fixing"
+title: "[Bug]: "
+labels: ["bug", "ai-ready"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## AI-Ready Bug Report
+        Please fill out this form with as much detail as possible. The structured format
+        helps both human contributors and AI assistants understand and fix the issue.
+
+        Make sure you're in the right repo: bouncer, installer and blocklist-import bugs each
+        have their own repo (see the links on the "New issue" page).
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What
+      description: One sentence describing the bug.
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-behavior
+    attributes:
+      label: Current Behavior
+      description: What happens now? Be specific.
+      placeholder: "Describe exactly what occurs, including any error messages or unexpected output."
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: What should happen instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: Minimal steps to trigger the bug.
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: How severe is this bug?
+      options:
+        - "Critical - System crash, data loss, or security vulnerability"
+        - "High - Major feature broken, no workaround"
+        - "Medium - Feature broken but workaround exists"
+        - "Low - Minor issue, cosmetic, or edge case"
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Provide details about your setup.
+      value: |
+        - OS / platform:
+        - Project version / commit:
+        - Install method (Docker, Homebrew, script, source):
+        - Runtime (Python/Go/Docker version):
+        - CrowdSec version (if used):
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ### UniFi / CrowdSec device details
+        Fill these in if the bug involves a UniFi device. Skip them otherwise.
+
+  - type: input
+    id: device-model
+    attributes:
+      label: UniFi device model
+      description: e.g., UDM SE, UDR, UCG-Ultra.
+      placeholder: "UDM SE"
+
+  - type: input
+    id: unifi-os-version
+    attributes:
+      label: UniFi OS version
+      description: From Settings > System > UniFi OS, or `cat /etc/unifi-os/unifi_version`.
+      placeholder: "4.x.x"
+
+  - type: textarea
+    id: ipset-status
+    attributes:
+      label: ipset list -t output
+      description: Run `ipset list -t` on the device and paste it. Needed for capacity or "Hash is full" reports.
+      render: shell
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / Error Output
+      description: Paste any relevant log output or error messages.
+      render: shell
+      placeholder: "Paste relevant logs here. This field will be rendered as a code block."
+
+  - type: textarea
+    id: where-in-code
+    attributes:
+      label: Where in the Code
+      description: File, function, or line range where the bug likely lives (optional).
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: Specific, testable requirements for the fix.
+      value: |
+        - [ ] Criterion 1
+        - [ ] Criterion 2
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched existing issues and this isn't a duplicate.
+          required: true
+        - label: This is not a security vulnerability (those go through SECURITY.md).
+          required: true

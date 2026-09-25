@@ -1,0 +1,72 @@
+name: "AI-Ready Feature Request"
+description: "Request a feature with enough context for AI-assisted implementation"
+title: "[Feature]: "
+labels: ["enhancement", "ai-ready"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## AI-Ready Feature Request
+        Please fill out this form with as much detail as possible. The structured format
+        helps both human contributors and AI assistants understand and implement the feature.
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What
+      description: One sentence describing the desired feature.
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: Why
+      description: What problem does it solve? Who needs it?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-behavior
+    attributes:
+      label: Proposed Behavior
+      description: How the feature should work from the user's side.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature?
+      options:
+        - "High - Core functionality gap or widely requested"
+        - "Medium - Useful improvement for many users"
+        - "Low - Nice to have, minor enhancement"
+    validations:
+      required: true
+
+  - type: input
+    id: device-model
+    attributes:
+      label: UniFi device model (if relevant)
+      placeholder: "UCG-Ultra"
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: Specific, testable requirements for the implementation.
+      value: |
+        - [ ] Criterion 1
+        - [ ] Criterion 2
+
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints
+      description: What must not break? Compatibility requirements?
+      placeholder: |
+        - Must not break: ...
+        - Must be configurable via: ...
+        - No new dependencies unless: ...

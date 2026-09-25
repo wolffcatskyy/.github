@@ -1,0 +1,68 @@
+name: Reusable release-please
+
+# Call from another repo on push to main:
+#   permissions:
+#     contents: write
+#     pull-requests: write
+#   jobs:
+#     release:
+#       uses: wolffcatskyy/.github/.github/workflows/reusable-release-please.yml@main
+#       with:
+#         release-type: simple
+
+on:
+  workflow_call:
+    inputs:
+      release-type:
+        description: release-please strategy (simple, python, go, node, ...). Ignored when config-file is set.
+        type: string
+        default: simple
+      config-file:
+        description: Path to release-please-config.json (manifest mode). Leave empty for single-package mode.
+        type: string
+        default: ""
+      manifest-file:
+        description: Path to .release-please-manifest.json (manifest mode).
+        type: string
+        default: ""
+      target-branch:
+        description: Branch to release from. Defaults to the repo's default branch.
+        type: string
+        default: ""
+    secrets:
+      release-token:
+        description: >-
+          Optional token. Releases made with GITHUB_TOKEN don't trigger other workflows
+          (e.g. tag-triggered builds); pass a token here if you need that.
+        required: false
+    outputs:
+      release_created:
+        description: "'true' when a release was created."
+        value: ${{ jobs.release-please.outputs.release_created }}
+      tag_name:
+        description: Tag of the created release.
+        value: ${{ jobs.release-please.outputs.tag_name }}
+      version:
+        description: Version of the created release.
+        value: ${{ jobs.release-please.outputs.version }}
+
+jobs:
+  release-please:
+    name: release-please
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      release_created: ${{ steps.rp.outputs.release_created }}
+      tag_name: ${{ steps.rp.outputs.tag_name }}
+      version: ${{ steps.rp.outputs.version }}
+    steps:
+      - id: rp
+        uses: googleapis/release-please-action@v5
+        with:
+          token: ${{ secrets.release-token || secrets.GITHUB_TOKEN }}
+          release-type: ${{ inputs.config-file == '' && inputs.release-type || '' }}
+          config-file: ${{ inputs.config-file }}
+          manifest-file: ${{ inputs.manifest-file }}
+          target-branch: ${{ inputs.target-branch }}

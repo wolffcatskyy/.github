@@ -1,0 +1,73 @@
+name: Reusable Cosign sign
+
+# Keyless signing through GitHub OIDC. No keys or secrets to manage.
+# Call after the image is pushed, passing its digest:
+#   sign:
+#     needs: build
+#     permissions:
+#       contents: read
+#       packages: write
+#       id-token: write
+#     uses: wolffcatskyy/.github/.github/workflows/reusable-cosign.yml@main
+#     with:
+#       image: ghcr.io/wolffcatskyy/crowdsec-sidecar
+#       digest: ${{ needs.build.outputs.digest }}
+
+on:
+  workflow_call:
+    inputs:
+      image:
+        description: Image name without tag or digest, e.g. ghcr.io/wolffcatskyy/crowdsec-sidecar
+        type: string
+        required: true
+      digest:
+        description: Image digest (sha256:...) from docker/build-push-action.
+        type: string
+        required: true
+      registry:
+        description: Registry to log in to with GITHUB_TOKEN. Empty to skip login.
+        type: string
+        default: ghcr.io
+      verify:
+        description: Verify the signature right after signing.
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  sign:
+    name: Sign image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    steps:
+      - uses: sigstore/cosign-installer@v4.1.2
+
+      - name: Log in to registry
+        if: inputs.registry != ''
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ inputs.registry }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Sign by digest
+        env:
+          REF: ${{ inputs.image }}@${{ inputs.digest }}
+        run: cosign sign --yes "$REF"
+
+      - name: Verify signature
+        if: inputs.verify
+        env:
+          REF: ${{ inputs.image }}@${{ inputs.digest }}
+          IDENTITY: ^https://github.com/${{ github.repository_owner }}/
+        run: |
+          cosign verify "$REF" \
+            --certificate-identity-regexp "$IDENTITY" \
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+            > /dev/null
+          echo "Signature verified for $REF"

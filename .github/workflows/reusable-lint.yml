@@ -1,0 +1,90 @@
+name: Reusable lint
+
+# Call from another repo:
+#   jobs:
+#     lint:
+#       uses: wolffcatskyy/.github/.github/workflows/reusable-lint.yml@main
+
+on:
+  workflow_call:
+    inputs:
+      shellcheck:
+        description: Run ShellCheck on shell scripts.
+        type: boolean
+        default: true
+      shellcheck-severity:
+        description: Minimum ShellCheck severity (error, warning, info, style).
+        type: string
+        default: warning
+      shellcheck-ignore:
+        description: Space-separated paths for ShellCheck to skip.
+        type: string
+        default: ""
+      yamllint:
+        description: Run yamllint.
+        type: boolean
+        default: true
+      yamllint-paths:
+        description: Space-separated paths for yamllint.
+        type: string
+        default: "."
+      yamllint-config:
+        description: yamllint config (inline YAML). Ignored when the repo has a .yamllint file.
+        type: string
+        default: "{extends: relaxed, rules: {line-length: {max: 120}}}"
+      line-endings:
+        description: Fail on CRLF line endings.
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  shellcheck:
+    name: ShellCheck
+    if: inputs.shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ludeeus/action-shellcheck@2.0.0
+        with:
+          scandir: "."
+          severity: ${{ inputs.shellcheck-severity }}
+          ignore_paths: ${{ inputs.shellcheck-ignore }}
+
+  yamllint:
+    name: YAML Lint
+    if: inputs.yamllint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install yamllint
+        run: pip install --quiet yamllint
+      - name: Lint YAML
+        env:
+          PATHS: ${{ inputs.yamllint-paths }}
+          CONFIG: ${{ inputs.yamllint-config }}
+        run: |
+          # shellcheck disable=SC2086
+          if [ -f .yamllint ] || [ -f .yamllint.yml ] || [ -f .yamllint.yaml ]; then
+            yamllint $PATHS
+          else
+            yamllint -d "$CONFIG" $PATHS
+          fi
+
+  line-endings:
+    name: Check line endings
+    if: inputs.line-endings
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Fail on CRLF
+        run: |
+          CRLF_FILES=$(git ls-files --eol | awk '$1 ~ /crlf/ || $2 ~ /crlf/ {print $NF}')
+          if [ -n "$CRLF_FILES" ]; then
+            echo "::error::These files have CRLF line endings:"
+            echo "$CRLF_FILES"
+            exit 1
+          fi
+          echo "All tracked files use LF line endings."

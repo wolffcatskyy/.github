@@ -1,0 +1,17 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/wolffcatskyy/.github/blob/main/SECURITY.md
+    about: Please report security problems privately, not as a public issue.
+  - name: Bouncer bugs (crowdsec-unifi-bouncer)
+    url: https://github.com/wolffcatskyy/crowdsec-unifi-bouncer/issues
+    about: Problems with the bouncer on a UniFi device belong in the bouncer repo.
+  - name: Installer bugs (crowdsec-unifi-suite)
+    url: https://github.com/wolffcatskyy/crowdsec-unifi-suite/issues
+    about: Problems with the one-line installer or CrowdSec setup on UniFi OS.
+  - name: Blocklist import bugs (crowdsec-blocklist-import)
+    url: https://github.com/wolffcatskyy/crowdsec-blocklist-import/issues
+    about: Problems with feeds, presets or the import container.
+  - name: AI-Ready Issues standard
+    url: https://github.com/wolffcatskyy/ai-ready-issues
+    about: How these issue forms are structured.

@@ -1,0 +1,49 @@
+name: Reusable link check
+
+# Call from another repo (weekly + on PR):
+#   on:
+#     pull_request:
+#     schedule:
+#       - cron: "17 6 * * 1"
+#   jobs:
+#     links:
+#       uses: wolffcatskyy/.github/.github/workflows/reusable-lychee.yml@main
+
+on:
+  workflow_call:
+    inputs:
+      args:
+        description: Arguments passed to lychee.
+        type: string
+        default: >-
+          --no-progress
+          --cache --max-cache-age 1d
+          --accept 200,206,429
+          --exclude-path node_modules
+          './**/*.md'
+      fail:
+        description: Fail the job when broken links are found.
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  lychee:
+    name: Link check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Restore lychee cache
+        uses: actions/cache@v6
+        with:
+          path: .lycheecache
+          key: lychee-${{ github.sha }}
+          restore-keys: lychee-
+      - name: Run lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: ${{ inputs.args }}
+          fail: ${{ inputs.fail }}
+          token: ${{ secrets.GITHUB_TOKEN }}
